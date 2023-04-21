@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+</head>
+<body>
+    <h1>카페 이미지 업로드</h1>
+    <form id="upload-form">
+        <label for="cafe-id">카페 ID:</label>
+        <input type="text" id="cafe-id" required>
+        <br><br>
+        <label for="image">이미지 선택:</label>
+        <input type="file" id="image" accept="image/*" required>
+        <br><br>
+        <button type="submit">이미지 업로드</button>
+    </form>
+    <script type="module" src="./admin.js"></script>
+</body>
+</html>

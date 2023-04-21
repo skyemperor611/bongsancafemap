@@ -2,6 +2,14 @@
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from './firebase.js';
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from './firebase.js';
+
+async function getDefaultImageURL() {
+  const defaultImageRef = ref(storage, 'OIG.jfif');
+  const defaultImageURL = await getDownloadURL(defaultImageRef);
+  return defaultImageURL;
+}
 
 async function fetchData() {
   const cafesSnapshot = await getDocs(collection(db, "cafes"));
@@ -12,23 +20,23 @@ async function fetchData() {
   return cafes;
 }
 
-function createCafeElement(cafe) {
-    const li = document.createElement('li');
-    li.classList.add('list-item');
-  
-    const img = document.createElement('img');
-    img.setAttribute('src', cafe.image || 'default-image-url.jpg'); // 기본 이미지 URL로 변경
-    img.setAttribute('width', '100');
-    img.setAttribute('height', '100');
-  
-    const name = document.createElement('p');
-    name.textContent = cafe.businessName;
-  
-    li.appendChild(img);
-    li.appendChild(name);
-  
-    return li;
-  }
+function createCafeElement(cafe, defaultImageURL) {
+  const li = document.createElement('li');
+  li.classList.add('list-item');
+
+  const img = document.createElement('img');
+  img.setAttribute('src', cafe.image || defaultImageURL);
+  img.setAttribute('width', '100');
+  img.setAttribute('height', '100');
+
+  const name = document.createElement('p');
+  name.textContent = cafe.businessName;
+
+  li.appendChild(img);
+  li.appendChild(name);
+
+  return li;
+}
 
 function createMap(cafes) {
     const bounds = new naver.maps.LatLngBounds(
@@ -74,9 +82,11 @@ function createMap(cafes) {
     cafes.sort((a, b) => a.businessName.localeCompare(b.businessName));
     const cafeList = document.getElementById('cafe-list');
     let infoWindow = null;
-  
+    
+    const defaultImageURL = await getDefaultImageURL();
+
     cafes.forEach((cafe) => {
-      const cafeElement = createCafeElement(cafe);
+      const cafeElement = createCafeElement(cafe, defaultImageURL);
       cafeElement.addEventListener('click', function() {
         const markerPosition = new naver.maps.LatLng(cafe.location._lat, cafe.location._long);
         const map = createMap(cafes);
@@ -109,8 +119,9 @@ function createMap(cafes) {
       });
       cafeList.appendChild(cafeElement);
     });
-  
+
     const map = createMap(cafes);
   }
+
   displayCafesAndMap();
   
